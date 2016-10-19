@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from bokeh.plotting import figure
-from bokeh.models import ColumnDataSource, CustomJS, Select, Slider, HoverTool
+from bokeh.models import (ColumnDataSource, CustomJS, Select, Slider,
+                          HoverTool)
 from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.layouts import column, row
@@ -17,7 +18,7 @@ CLASSIFIERS = {
                     'step': 1, 'value': 4},
     },
     'k-NN': {
-        'slider1': {'title': 'n_neighbors', 'start': 1, 'end': 10,
+        'slider1': {'title': 'n_neighbors', 'start': 1, 'end': 30,
                     'step': 1, 'value': 4},  # 'Nr of neighbors',
         'slider2': {'title': 'weights', 'start': 0, 'end': 1,
                     'step': 1, 'value': 1},  # 'Weight function'
@@ -46,17 +47,16 @@ def plot_points(fig, source, classes):
         if class_nr == 0:
             colors.append("#111111")  # "#ff5400")
         else:
-            colors.append("#00b7a7")  # "#ff00f5")
+            colors.append("#dddddd")  # "#00b7a7")
 
-    return fig.scatter('x', 'y', source=source, size=10, fill_color=colors,
+    return fig.scatter(x='x', y='y', source=source, size=10, fill_color=colors,
                        fill_alpha=0.7, line_color='#000000')
 
 
 def create():
 
-    # x_train, x_test, y_train, y_test = decisionboundary.get_data()
-    x_train = decisionboundary.x_train
-    y_train = decisionboundary.y_train
+    x_train = decisionboundary.X_TRAIN
+    y_train = decisionboundary.Y_TRAIN
     source = ColumnDataSource(data=dict(x=x_train[:, 0], y=x_train[:, 1]))
 
     # Figure
@@ -66,10 +66,13 @@ def create():
         "pan, wheel_zoom, box_select, lasso_select, reset, save"]
 
     fig = figure(tools=tools, plot_width=1110, plot_height=600,
+                 x_range=decisionboundary.get_padded_range(x_train[:, 0]),
+                 y_range=decisionboundary.get_padded_range(x_train[:, 1]),
                  toolbar_location="right", background_fill_color="#fafafa",
                  active_drag="pan", active_scroll="wheel_zoom", logo=None)
     fig.xaxis.visible = False
     fig.yaxis.visible = False
+    fig.border_fill_color = None
 
     # Decision region
     # -------------------------------------------------------------------------
@@ -118,8 +121,8 @@ def create():
                 slider2.step = json_from_server.slider2.step;
                 slider2.value = json_from_server.slider2.value;
 
-                slider1.trigger('change');
-                slider2.trigger('change');
+                // slider1.trigger('change');
+                // slider2.trigger('change');
             },
             error: function() {
                 alert("Oh no, something went wrong.");

@@ -1,6 +1,6 @@
 
-/*
 
+/*
 body {
     background-color: #030001;
     background-image: url("https://www.transparenttextures.com/patterns/old-wall.png");
@@ -10,20 +10,26 @@ body {
     background-color: #ffffff;
     background-image: url("https://www.transparenttextures.com/patterns/shattered-dark.png");
 }
-
+*/
 body {
     background-color: #ffffff;
     background-image: url("https://www.transparenttextures.com/patterns/shattered.png");
 }
 
-*/
+html, body {
+    margin: 0;
+    padding: 0;
+}
 
 body {
     background-color: white;
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
 }
 
 .container {
-    padding: 30px;
+    padding-bottom: 20px;
+    width: 1100px;
+    margin: 0 auto;
 }
 
 .jumbotron {
@@ -33,9 +39,13 @@ body {
 }
 
 .title {
-    background: #2eb9a7;
+    font-size: 25px;
+    background: #636363;
     color: white;
     padding: 20px;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    margin-left: 5px;
 }
 
 /*-----------------------------------------------------------------------------
