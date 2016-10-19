@@ -9,15 +9,10 @@ from . import app, bokehscatter, decisionboundary
 
 @app.route('/')
 def index():
-
     script, div, js_resources, css_resources = bokehscatter.create()
-
     return render_template(
-        template_name_or_list='index.html',
-        script=script,
-        div=div,
-        js_resources=js_resources,
-        css_resources=css_resources)
+        template_name_or_list='index.html', script=script, div=div,
+        js_resources=js_resources, css_resources=css_resources)
 
 
 @app.route("/get_classifier_info", methods=['POST'])

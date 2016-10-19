@@ -37,7 +37,8 @@ def plot_decision_region(fig):
     d, x_min, y_min, dw, dh = decisionboundary.knn()
     source_region = ColumnDataSource(data={'d': [d]})
     region = fig.image(image='d', x=x_min, y=y_min,
-                       dw=dw, dh=dh, palette="Greys3", source=source_region)
+                       dw=dw, dh=dh, source=source_region,
+                       palette=['#DC9C76', '#D6655A'])
     return region, source_region
 
 
@@ -45,12 +46,12 @@ def plot_points(fig, source, classes):
     colors = []
     for class_nr in classes:
         if class_nr == 0:
-            colors.append("#111111")  # "#ff5400")
+            colors.append("#DC9C76")
         else:
-            colors.append("#dddddd")  # "#00b7a7")
+            colors.append("#D6655A")
 
     return fig.scatter(x='x', y='y', source=source, size=10, fill_color=colors,
-                       fill_alpha=0.7, line_color='#000000')
+                       fill_alpha=0.9, line_color='#000000')
 
 
 def create():

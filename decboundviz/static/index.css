@@ -1,29 +1,12 @@
-
-
-/*
-body {
-    background-color: #030001;
-    background-image: url("https://www.transparenttextures.com/patterns/old-wall.png");
-}
-
-body {
-    background-color: #ffffff;
-    background-image: url("https://www.transparenttextures.com/patterns/shattered-dark.png");
-}
-*/
-body {
-    background-color: #ffffff;
-    background-image: url("https://www.transparenttextures.com/patterns/shattered.png");
-}
-
 html, body {
     margin: 0;
     padding: 0;
 }
 
 body {
-    background-color: white;
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    background-color: #ffffff;
+    background-image: url("https://www.transparenttextures.com/patterns/shattered.png");
+    font-family: 'Roboto', sans-serif;
 }
 
 .container {
@@ -32,14 +15,9 @@ body {
     margin: 0 auto;
 }
 
-.jumbotron {
-    padding: 20px;
-    background: #21b57e;
-    color: white;
-}
-
 .title {
     font-size: 25px;
+    font-weight: 100;
     background: #636363;
     color: white;
     padding: 20px;
@@ -52,7 +30,9 @@ body {
 Bokeh */
 
 .bk-root {
-    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    color: #636363;
 }
 
 /* Widget container */
@@ -63,10 +43,35 @@ Bokeh */
 /* Select box */
 .bk-root .bk-widget-form-input {
     border-radius: 0;
+    -webkit-appearance: none;
+    -webkit-border-radius: 0px;
+    background: url("data:image/svg+xml;utf8,<svg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='24' height='24' viewBox='0 0 24 24'><path fill='#444' d='M7.406 7.828l4.594 4.594 4.594-4.594 1.406 1.406-6 6-6-6z'></path></svg>");
+    background-position: 100% 50%;
+    background-repeat: no-repeat;
+    background-color: white;
+    outline: none;
+}
+.bk-root .bk-widget-form-input:focus {
+    outline: none;
+    outline-width: 0;
+    border: 1px solid #ccc;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    /*
+    border-color: #adadad;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(179, 179, 179);
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 8px rgb(179, 179, 1
+    */
 }
 
 /* Without this width the label will collapse if label is too short
 (bug in Bokeh) */
 .bk-root .bk-widget label {
     width: 100%;
+}
+
+/* Slider */
+.bk-root .bk-ui-state-default, .bk-root .bk-ui-widget-content .bk-ui-state-default, .bk-root .bk-ui-widget-header .bk-ui-state-default {
+    outline: none;          /* Disable ugly focus */
+    border-radius: 0;       /* Sharp edges */
 }
