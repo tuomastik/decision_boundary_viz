@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Decision Boundary Visualizer</title>
+    {{ js_resources|safe }}
+    {{ css_resources|safe }}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='index.css') }}"/>
+</head>
+<body>
+    <div class="container">
+        <!--<h1 class="title">decision boundary viz</h1>-->
+        <div>
+            {{ script|safe }}
+            {{ div|safe }}
+        </div>
+    </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='jquery/jquery-3.1.1.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='index.js') }}"></script>
+</body>
+</html>

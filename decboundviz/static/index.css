@@ -1,0 +1,62 @@
+
+/*
+
+body {
+    background-color: #030001;
+    background-image: url("https://www.transparenttextures.com/patterns/old-wall.png");
+}
+
+body {
+    background-color: #ffffff;
+    background-image: url("https://www.transparenttextures.com/patterns/shattered-dark.png");
+}
+
+body {
+    background-color: #ffffff;
+    background-image: url("https://www.transparenttextures.com/patterns/shattered.png");
+}
+
+*/
+
+body {
+    background-color: white;
+}
+
+.container {
+    padding: 30px;
+}
+
+.jumbotron {
+    padding: 20px;
+    background: #21b57e;
+    color: white;
+}
+
+.title {
+    background: #2eb9a7;
+    color: white;
+    padding: 20px;
+}
+
+/*-----------------------------------------------------------------------------
+Bokeh */
+
+.bk-root {
+    font-family: "Open Sans","Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+/* Widget container */
+.bk-root .bk-widget  {
+    margin-left: -5px;
+}
+
+/* Select box */
+.bk-root .bk-widget-form-input {
+    border-radius: 0;
+}
+
+/* Without this width the label will collapse if label is too short
+(bug in Bokeh) */
+.bk-root .bk-widget label {
+    width: 100%;
+}
