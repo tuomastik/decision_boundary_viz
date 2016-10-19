@@ -3,7 +3,7 @@
 import numpy as np
 from bokeh.plotting import figure
 from bokeh.models import (ColumnDataSource, CustomJS, Select, Slider,
-                          HoverTool)
+                          HoverTool, CheckboxGroup)
 from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.layouts import column, row
@@ -56,17 +56,15 @@ def create_sources(data_points, classes):
 
 def create(x_train, x_test, y_train, y_test):
 
+    # Create ColumnDataSources to store the examples in
     example_sources_train = create_sources(x_train, y_train)
     example_sources_test = create_sources(x_test, y_test)
-
-    # source = ColumnDataSource(data=dict(x=x_train[:, 0], y=x_train[:, 1]))
 
     # Figure
     # -------------------------------------------------------------------------
     tools = [
         HoverTool(tooltips=[("Index", "$index"), ("X", "@x"), ("Y", "@y")]),
         "pan, wheel_zoom, box_select, lasso_select, reset, save"]
-
     fig = figure(tools=tools, plot_width=1110, plot_height=600,
                  x_range=utils.get_padded_range(utils.X_TRAIN_TEST[:, 0]),
                  y_range=utils.get_padded_range(utils.X_TRAIN_TEST[:, 1]),
@@ -84,15 +82,40 @@ def create(x_train, x_test, y_train, y_test):
     # -------------------------------------------------------------------------
     colors = ["#D9CFB0", "#42282E"]
     markers = ["circle", "triangle"]
-    train_scatters, test_scatters = [], []
-    for train_source, test_source, color, marker in zip(
-            example_sources_train, example_sources_test, colors, markers):
-        train_scatters.append(fig.scatter(
+    scatters = {}
+    for i, (train_source, test_source, color, marker) in enumerate(zip(
+            example_sources_train, example_sources_test, colors, markers)):
+        scatters['train_scatter_class_%s' % i] = fig.scatter(
             x='x', y='y', source=train_source, size=10, fill_color=color,
-            fill_alpha=.9, line_color='#111111', line_alpha=.9, marker=marker))
-        test_scatters.append(fig.scatter(
+            fill_alpha=.9, line_color='#111111', line_alpha=.9, marker=marker)
+        scatters['test_scatter_class_%s' % i] = fig.scatter(
             x='x', y='y', source=test_source, size=10, fill_color=color,
-            fill_alpha=.3, line_color='#111111', line_alpha=.3, marker=marker))
+            fill_alpha=.3, line_color='#111111', line_alpha=.3, marker=marker)
+
+    # Checkboxes to show/hide data points
+    # -------------------------------------------------------------------------
+    checkbox_show_points = CheckboxGroup(
+        labels=["Show training data", "Show testing data"], active=[0, 1],
+        callback=CustomJS(args=scatters, code="""
+        var show_training_data = cb_obj.active.indexOf(0) !== -1;
+        var show_testing_data = cb_obj.active.indexOf(1) !== -1;
+        var max_classes_to_check = 20;
+        var source_name_train, source_name_test;
+        var source_train, source_test;
+        for (var class_nr=0; class_nr < max_classes_to_check; ++class_nr) {
+            try {
+                source_name_train = "train_scatter_class_"+class_nr.toString();
+                source_name_test = "test_scatter_class_"+class_nr.toString();
+                source_train = eval(source_name_train);
+                source_test = eval(source_name_test);
+                source_train.visible = show_training_data;
+                source_test.visible = show_testing_data;
+            } catch (e) {
+                // Do nothing.
+                // We end up in here if eval() name is undefined.
+            }
+        }
+    """))
 
     # Sliders
     # -------------------------------------------------------------------------
@@ -176,6 +199,7 @@ def create(x_train, x_test, y_train, y_test):
     # Generate layout, HTML, CSS and JS
     # -------------------------------------------------------------------------
     layout = column(row(select_clf, slider1, slider2),
+                    row(checkbox_show_points),
                     row(fig))
     js_resources = INLINE.render_js()
     css_resources = INLINE.render_css()
