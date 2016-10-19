@@ -75,3 +75,8 @@ Bokeh */
     outline: none;          /* Disable ugly focus */
     border-radius: 0;       /* Sharp edges */
 }
+
+/* Accuracy text */
+.accuracy {
+    font-weight: 300;
+}

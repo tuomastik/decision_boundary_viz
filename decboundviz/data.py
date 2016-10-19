@@ -16,7 +16,7 @@ def get_padded_range(array, padding=0.1):
     return min_val, max_val
 
 
-def create_artificial_data(seed=85):
+def create_artificial(seed=85):
     x, y = make_classification(n_features=2, n_redundant=0, n_informative=2,
                                random_state=seed, n_clusters_per_class=1)
     x = StandardScaler().fit_transform(x)
@@ -25,11 +25,11 @@ def create_artificial_data(seed=85):
     return x_train, x_test, y_train, y_test
 
 
-def set_data(x_train, x_test, y_train, y_test):
+def initialize(x_train, x_test, y_train, y_test):
     global X_TRAIN, X_TEST, X_TRAIN_TEST, Y_TRAIN, Y_TEST
     X_TRAIN, X_TEST, Y_TRAIN, Y_TEST = x_train, x_test, y_train, y_test
     X_TRAIN_TEST = np.concatenate((x_train, x_test))
 
 
-def get_data():
+def get():
     return X_TRAIN, X_TEST, Y_TRAIN, Y_TEST

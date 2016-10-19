@@ -4,14 +4,14 @@ import json
 
 from flask import render_template, request
 
-from . import app, bokehscatter, utils, decisionboundary
+from . import app, bokehscatter, data, classifiers
 
 
 @app.route('/')
 def index():
-    utils.set_data(*utils.create_artificial_data())
+    data.initialize(*data.create_artificial())
     script, div, js_resources, css_resources = bokehscatter.create(
-        *utils.get_data())
+        *data.get())
     return render_template(
         template_name_or_list='index.html', script=script, div=div,
         js_resources=js_resources, css_resources=css_resources)
@@ -19,7 +19,7 @@ def index():
 
 @app.route("/get_classifier_info", methods=['POST'])
 def get_classifier_info():
-    clf_info = bokehscatter.CLASSIFIERS[request.form['newly_selected_clf']]
+    clf_info = classifiers.CLFS[request.form['newly_selected_clf']]
     return json.dumps(clf_info)
 
 
@@ -28,12 +28,20 @@ def get_new_decision_boundary():
     app.logger.info("Browser sent the following: %s", json.dumps(request.form))
     clf_name = request.form['clf_name']
     params = {
-        request.form['attr1_name'].strip().replace(':', ''):
-            request.form['attr1_val'],
-        request.form['attr2_name'].strip().replace(':', ''):
-            request.form['attr2_val']}
+        # Bokeh automatically adds ':' and whitespace to Slider label
+        request.form['param1_name'].strip().replace(':', ''):
+            request.form['param1_val'],
+        request.form['param2_name'].strip().replace(':', ''):
+            request.form['param2_val']}
     # app.logger.debug("Returning to client: %s", clf_info)
     if clf_name == 'k-NN':
-        return json.dumps(decisionboundary.knn(**params))
+        clf = classifiers.train_knn(**params)
+    elif clf_name == 'SVM (RBF kernel)':
+        clf = classifiers.train_svm(**params)
+    elif clf_name == 'Random forest':
+        clf = classifiers.train_rf(**params)
     else:
         return json.dumps([1, 2, 3])
+    return json.dumps({
+        'new_dec_bound': classifiers.get_decision_boundary(clf=clf)[0],
+        'accuracy': '%.2f' % classifiers.get_accuracy(clf=clf)})
