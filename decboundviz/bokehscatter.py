@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
 from bokeh.plotting import figure
 from bokeh.models import (ColumnDataSource, CustomJS, Select, Slider,
                           HoverTool)
@@ -7,7 +8,7 @@ from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.layouts import column, row
 
-from . import decisionboundary
+from . import decisionboundary, utils
 
 
 CLASSIFIERS = {
@@ -18,7 +19,7 @@ CLASSIFIERS = {
                     'step': 1, 'value': 4},
     },
     'k-NN': {
-        'slider1': {'title': 'n_neighbors', 'start': 1, 'end': 30,
+        'slider1': {'title': 'n_neighbors', 'start': 1, 'end': 50,
                     'step': 1, 'value': 4},  # 'Nr of neighbors',
         'slider2': {'title': 'weights', 'start': 0, 'end': 1,
                     'step': 1, 'value': 1},  # 'Weight function'
@@ -42,23 +43,23 @@ def plot_decision_region(fig):
     return region, source_region
 
 
-def plot_points(fig, source, classes):
-    colors = []
-    for class_nr in classes:
-        if class_nr == 0:
-            colors.append("#DC9C76")
-        else:
-            colors.append("#D6655A")
+def create_sources(data_points, classes):
+    """ Create one ColumnDataSource for examples in each class. """
+    sources = []
+    for unique_class in np.sort(np.unique(classes)):
+        class_example_ix = np.where(classes == unique_class)[0]
+        sources.append(
+            ColumnDataSource(data={'x': data_points[class_example_ix, 0],
+                                   'y': data_points[class_example_ix, 1]}))
+    return sources
 
-    return fig.scatter(x='x', y='y', source=source, size=10, fill_color=colors,
-                       fill_alpha=0.9, line_color='#000000')
 
+def create(x_train, x_test, y_train, y_test):
 
-def create():
+    example_sources_train = create_sources(x_train, y_train)
+    example_sources_test = create_sources(x_test, y_test)
 
-    x_train = decisionboundary.X_TRAIN
-    y_train = decisionboundary.Y_TRAIN
-    source = ColumnDataSource(data=dict(x=x_train[:, 0], y=x_train[:, 1]))
+    # source = ColumnDataSource(data=dict(x=x_train[:, 0], y=x_train[:, 1]))
 
     # Figure
     # -------------------------------------------------------------------------
@@ -67,8 +68,8 @@ def create():
         "pan, wheel_zoom, box_select, lasso_select, reset, save"]
 
     fig = figure(tools=tools, plot_width=1110, plot_height=600,
-                 x_range=decisionboundary.get_padded_range(x_train[:, 0]),
-                 y_range=decisionboundary.get_padded_range(x_train[:, 1]),
+                 x_range=utils.get_padded_range(utils.X_TRAIN_TEST[:, 0]),
+                 y_range=utils.get_padded_range(utils.X_TRAIN_TEST[:, 1]),
                  toolbar_location="right", background_fill_color="#fafafa",
                  active_drag="pan", active_scroll="wheel_zoom", logo=None)
     fig.xaxis.visible = False
@@ -81,7 +82,17 @@ def create():
 
     # Scatter plot
     # -------------------------------------------------------------------------
-    plot_points(fig, source, y_train)
+    colors = ["#D9CFB0", "#42282E"]
+    markers = ["circle", "triangle"]
+    train_scatters, test_scatters = [], []
+    for train_source, test_source, color, marker in zip(
+            example_sources_train, example_sources_test, colors, markers):
+        train_scatters.append(fig.scatter(
+            x='x', y='y', source=train_source, size=10, fill_color=color,
+            fill_alpha=.9, line_color='#111111', line_alpha=.9, marker=marker))
+        test_scatters.append(fig.scatter(
+            x='x', y='y', source=test_source, size=10, fill_color=color,
+            fill_alpha=.3, line_color='#111111', line_alpha=.3, marker=marker))
 
     # Sliders
     # -------------------------------------------------------------------------
@@ -134,8 +145,8 @@ def create():
     # Slider callback
     # -------------------------------------------------------------------------
     general_slider_callback = CustomJS(
-        args=dict(source=source, select_clf=select_clf, slider1=slider1,
-                  slider2=slider2, region=region, source_region=source_region),
+        args=dict(select_clf=select_clf, slider1=slider1, slider2=slider2,
+                  source_region=source_region),
         code="""
         var clf_name = select_clf.value;
         var attr1_name = $("label[for='" + slider1.id + "']").html();

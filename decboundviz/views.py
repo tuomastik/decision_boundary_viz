@@ -4,12 +4,14 @@ import json
 
 from flask import render_template, request
 
-from . import app, bokehscatter, decisionboundary
+from . import app, bokehscatter, utils, decisionboundary
 
 
 @app.route('/')
 def index():
-    script, div, js_resources, css_resources = bokehscatter.create()
+    utils.set_data(*utils.create_artificial_data())
+    script, div, js_resources, css_resources = bokehscatter.create(
+        *utils.get_data())
     return render_template(
         template_name_or_list='index.html', script=script, div=div,
         js_resources=js_resources, css_resources=css_resources)
