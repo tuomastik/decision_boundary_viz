@@ -2,25 +2,14 @@
 
 import numpy as np
 from bokeh.plotting import figure
-from bokeh.models import (ColumnDataSource, CustomJS, Select, Slider,
+from bokeh.models import (ColumnDataSource, CustomJS, Select,
                           HoverTool, CheckboxGroup, Div)
 from bokeh.embed import components
 from bokeh.resources import INLINE
 from bokeh.layouts import column, row
 
-from . import classifiers, data
-
-
-def plot_decision_region(fig):
-    clf = classifiers.train_knn(
-        n_neighbors=classifiers.CLFS['k-NN']['slider1']['value'],
-        weights=classifiers.CLFS['k-NN']['slider2']['value'])
-    d, x_min, y_min, dw, dh = classifiers.get_decision_boundary(clf=clf)
-    source_region = ColumnDataSource(data={'d': [d]})
-    region = fig.image(image='d', x=x_min, y=y_min,
-                       dw=dw, dh=dh, source=source_region,
-                       palette=['#DC9C76', '#D6655A'])
-    return region, source_region
+from . import data
+from .classifiers import Classifiers
 
 
 def create_sources(data_points, classes):
@@ -34,11 +23,11 @@ def create_sources(data_points, classes):
     return sources
 
 
-def create(x_train, x_test, y_train, y_test):
+def create(default_clf):
 
     # Create ColumnDataSources to store the examples in
-    example_sources_train = create_sources(x_train, y_train)
-    example_sources_test = create_sources(x_test, y_test)
+    example_sources_train = create_sources(data.X_TRAIN, data.Y_TRAIN)
+    example_sources_test = create_sources(data.X_TEST, data.Y_TEST)
 
     # Figure
     # -------------------------------------------------------------------------
@@ -56,7 +45,12 @@ def create(x_train, x_test, y_train, y_test):
 
     # Decision region
     # -------------------------------------------------------------------------
-    region, source_region = plot_decision_region(fig)
+    default_clf.train({default_clf.slider1.title: default_clf.slider1.value,
+                       default_clf.slider2.title: default_clf.slider2.value})
+    d, x_min, y_min, dw, dh = default_clf.get_decision_boundary()
+    source_region = ColumnDataSource(data={'d': [d]})
+    fig.image(image='d', x=x_min, y=y_min, dw=dw, dh=dh, source=source_region,
+              palette=['#DC9C76', '#D6655A'])
 
     # Scatter plot
     # -------------------------------------------------------------------------
@@ -99,15 +93,13 @@ def create(x_train, x_test, y_train, y_test):
 
     # Sliders
     # -------------------------------------------------------------------------
-    slider1 = Slider(**classifiers.CLFS[classifiers.DEFAULT_CLF]['slider1'],
-                     width=800)
-    slider2 = Slider(**classifiers.CLFS[classifiers.DEFAULT_CLF]['slider2'],
-                     width=800)
+    slider1, slider2 = default_clf.slider1, default_clf.slider2
+    slider1.width, slider2.width = 800, 800
 
     # Classifier select box
     # -------------------------------------------------------------------------
-    select_clf = Select(title='Classifier', value=classifiers.DEFAULT_CLF,
-                        options=list(classifiers.CLFS.keys()))
+    select_clf = Select(title='Classifier', value=default_clf.name,
+                        options=Classifiers.get_classifier_names())
 
     # Classifier select box callback
     # -------------------------------------------------------------------------
@@ -151,8 +143,12 @@ def create(x_train, x_test, y_train, y_test):
                   source_region=source_region),
         code="""
         var clf_name = select_clf.value;
-        var param1_name = $("label[for='" + slider1.id + "']").html();
-        var param2_name = $("label[for='" + slider2.id + "']").html();
+        // Bokeh automatically adds ':' and whitespace to Slider label.
+        // Let's remove them.
+        var param1_name = $("label[for='" + slider1.id + "']").html().replace(
+            ":", "").trim();
+        var param2_name = $("label[for='" + slider2.id + "']").html().replace(
+            ":", "").trim();
         var param1_val = slider1.value;
         var param2_val = slider2.value;
         jQuery.ajax({
@@ -165,8 +161,9 @@ def create(x_train, x_test, y_train, y_test):
             success: function (json_from_server) {
                 source_region.data.d = [json_from_server.new_dec_bound];
                 source_region.trigger('change');
-                accuracy_text.text = "<h2 class='accuracy'>Test accuracy: " +
-                                     json_from_server.accuracy + " %</h2>";
+                accuracy_text.text = "<h2 class='accuracy'>" +
+                    "Train accuracy: " + json_from_server.train_acc + "<br>" +
+                    "Test accuracy: " + json_from_server.test_acc + "</h2>";
             },
             error: function() {
                 alert("Oh no, something went wrong.");
