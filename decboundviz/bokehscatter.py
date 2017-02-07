@@ -117,8 +117,8 @@ def create(default_clf):
                 // has no effect. Thus, change the label through jQuery.
                 var slider1_label = $("label[for='" + slider1.id + "']");
                 var slider2_label = $("label[for='" + slider2.id + "']");
-                slider1_label.html(json_from_server.slider1.title);
-                slider2_label.html(json_from_server.slider2.title);
+                slider1_label.html(json_from_server.slider1.title + ':');
+                slider2_label.html(json_from_server.slider2.title + ':');
 
                 slider1.start = json_from_server.slider1.start;
                 slider1.end = json_from_server.slider1.end;
@@ -184,7 +184,5 @@ def create(default_clf):
                     row(checkbox_show_points, slider2),
                     row(fig),
                     row(accuracy_text))
-    js_resources = INLINE.render_js()
-    css_resources = INLINE.render_css()
-    script, div = components(layout, INLINE)
-    return script, div, js_resources, css_resources
+    script, div = components(layout)
+    return script, div, INLINE.render_js(), INLINE.render_css()

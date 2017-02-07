@@ -64,12 +64,6 @@ Bokeh */
     */
 }
 
-/* Without this width the label will collapse if label is too short
-(bug in Bokeh) */
-.bk-root .bk-widget label {
-    width: 100%;
-}
-
 /* Slider */
 .bk-root .bk-ui-state-default, .bk-root .bk-ui-widget-content .bk-ui-state-default, .bk-root .bk-ui-widget-header .bk-ui-state-default {
     outline: none;          /* Disable ugly focus */
@@ -78,5 +72,5 @@ Bokeh */
 
 /* Accuracy text */
 .accuracy {
-    font-weight: 300;
+    font-weight: 100;
 }
