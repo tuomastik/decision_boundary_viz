@@ -1,9 +1,26 @@
 # decision_boundary_viz
-Interactive decision boundary visualizer
+
+A web app for visualizing decision boundaries of classifiers.
+
+Supports 2-dimensional data and the following classifiers and their parameters:
+
+* k-Nearest Neighbors
+    * Number of neighbors
+    * Weight function
+        * Uniform weights
+        * Points weighted by the inverse of their distance
+* Random forest
+    * The number of trees in the forest
+    * The maximum depth of trees
+* Support vector machine (RBF kernel)
+    * Cost (C)
+    * Gamma
+
+## Demo
 
 ![](app_usage.gif)
 
-##Prerequisites
+## Dependencies
 
 * [NumPy](http://www.numpy.org/) (numerical operations)
 * [scikit-learn](http://scikit-learn.org/) (classifiers)
